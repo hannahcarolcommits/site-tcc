@@ -1,56 +1,185 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estrada Segura - Proteção ao Caminhoneiro</title>
+    <title>Estrada Segura - Inteligência e Proteção Rodoviária</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <nav class="navbar">
-        <div class="logo"><i class="fa-solid fa-shield-halved"></i> ESTRADA SEGURA</div>
-        <ul class="nav-links">
-            <li><a href="index.html" class="active">Início</a></li>
-            <li><a href="app.html">Simulador do App</a></li>
-            <li><a href="sobre.html">Sobre o Projeto</a></li>
-        </ul>
+        <a href="index.html" class="logo">
+            <div class="logo-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <span>ESTRADA <strong>SEGURA</strong></span>
+        </a>
+
+        <button class="mobile-menu-btn" onclick="toggleMobileNav()" aria-label="Abrir menu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <div class="nav-right" id="nav-menu">
+            <ul class="nav-links">
+                <li><a href="index.html" class="active">Início</a></li>
+                <li><a href="app.html">Painel & Simulador</a></li>
+                <li><a href="sobre.html">Sobre o Projeto</a></li>
+            </ul>
+            <button class="theme-toggle-btn" onclick="toggleTheme()" title="Alternar Modo Claro/Escuro">
+                <i class="fa-solid fa-sun" id="theme-icon"></i>
+                <span class="theme-label">Tema</span>
+            </button>
+        </div>
     </nav>
 
     <header class="hero">
+        <div class="hero-overlay"></div>
         <div class="hero-content">
-            <h1>A Segurança da sua Carga em Nossas Mãos</h1>
-            <p>Tecnologia, planejamento e monitoramento para combater a insegurança nas rodovias brasileiras.</p>
-            <a href="app.html" class="btn btn-primary">Acessar Simulador do App</a>
+            <span class="badge-hero"><i class="fa-solid fa-satellite-dish"></i> Telemetria & Prevenção Rodoviária</span>
+            <h1>A Segurança da sua Carga e Vida em Tempo Real</h1>
+            <p>Monitoramento preditivo de manchas criminais, bloqueio inteligente e resposta rápida para proteger quem transporta o Brasil.</p>
+            
+            <div class="hero-actions">
+                <a href="app.html" class="btn btn-primary">
+                    <i class="fa-solid fa-truck-fast"></i> Abrir Simulador Interativo
+                </a>
+                <a href="#como-funciona" class="btn btn-outline">
+                    <i class="fa-solid fa-layer-group"></i> Conhecer Recursos
+                </a>
+            </div>
+
+            <div class="hero-stats">
+                <div class="stat-pill">
+                    <strong>+1.2 Bi</strong>
+                    <span>Prejuízo anual evitável</span>
+                </div>
+                <div class="stat-pill">
+                    <strong>68,1%</strong>
+                    <span>Foco na malha Sudeste</span>
+                </div>
+                <div class="stat-pill">
+                    <strong>&lt; 3 min</strong>
+                    <span>Protocolo de bloqueio</span>
+                </div>
+            </div>
         </div>
     </header>
 
     <section class="container info-section">
         <div class="section-title">
-            <h2>O Tamanho do Desafio</h2>
-            <p>Entenda o cenário atual do transporte rodoviário no Brasil</p>
+            <span class="section-kicker">CENÁRIO LOGÍSTICO</span>
+            <h2>O Tamanho do Desafio nas Estradas</h2>
+            <p>Clique nos cartões abaixo para expandir os indicadores operacionais</p>
         </div>
         <div class="cards-grid">
-            <div class="info-card">
-                <i class="fa-solid fa-money-bill-trend-up"></i>
-                <h3>Prejuízos Bilionários</h3>
-                <p>O roubo de cargas gera prejuízos superiores a R$ 1 bilhão anuais ao setor logístico.</p>
+            <div class="info-card interactive-card" onclick="toggleDetalhes(this)">
+                <div class="card-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80" alt="Transporte de carga e logística">
+                </div>
+                <div class="card-body">
+                    <div class="card-icon"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+                    <h3>Prejuízos Bilionários</h3>
+                    <p>O roubo de cargas gera perdas superiores a R$ 1,2 bilhão por ano na cadeia de suprimentos.</p>
+                    <span class="card-hint">Ver impacto completo <i class="fa-solid fa-chevron-down"></i></span>
+                    <div class="card-extra">
+                        <p>Além da mercadoria perdida, o custo de gerenciamento de risco, apólices de seguro e escoltas encarece o frete em até 18%, refletindo diretamente no preço ao consumidor final.</p>
+                    </div>
+                </div>
             </div>
-            <div class="info-card">
-                <i class="fa-solid fa-map-location-dot"></i>
-                <h3>Zonas de Risco</h3>
-                <p>A região Sudeste concentra cerca de 68,1% dos casos de roubo de cargas, exigindo rotas mais inteligentes.</p>
+
+            <div class="info-card interactive-card" onclick="toggleDetalhes(this)">
+                <div class="card-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=800&q=80" alt="Caminhão na rodovia ao entardecer">
+                </div>
+                <div class="card-body">
+                    <div class="card-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+                    <h3>Zonas de Sombra e Risco</h3>
+                    <p>O Sudeste concentra 68,1% das ocorrências, especialmente em entroncamentos urbanos e serras.</p>
+                    <span class="card-hint">Ver análise de rotas <i class="fa-solid fa-chevron-down"></i></span>
+                    <div class="card-extra">
+                        <p>Quadrilhas utilizam bloqueadores de sinal (jammers) em trechos sem cobertura celular. O roteamento preditivo alerta o motorista antes da entrada na área crítica.</p>
+                    </div>
+                </div>
             </div>
-            <div class="info-card">
-                <i class="fa-solid fa-truck-medical"></i>
-                <h3>Integridade do Motorista</h3>
-                <p>A insegurança afeta não só a carga, mas a integridade física e psicológica dos profissionais das estradas.</p>
+
+            <div class="info-card interactive-card" onclick="toggleDetalhes(this)">
+                <div class="card-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=800&q=80" alt="Cabine de caminhão moderno na estrada">
+                </div>
+                <div class="card-body">
+                    <div class="card-icon"><i class="fa-solid fa-truck-medical"></i></div>
+                    <h3>Proteção ao Motorista</h3>
+                    <p>Mais do que ativos financeiros, priorizamos a integridade física e mental do condutor.</p>
+                    <span class="card-hint">Ver protocolos humanos <i class="fa-solid fa-chevron-down"></i></span>
+                    <div class="card-extra">
+                        <p>O botão SOS silencioso evita confrontos diretos, acionando a Polícia Rodoviária Federal e ambulâncias de resgate com geolocalização precisa.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="como-funciona" class="container solution-section">
+        <div class="section-title">
+            <span class="section-kicker">TECNOLOGIA EMBARCADA</span>
+            <h2>Como o Estrada Segura Atua</h2>
+            <p>Navegue pelos módulos integrados da plataforma</p>
+        </div>
+
+        <div class="interactive-tabs">
+            <div class="tab-controls">
+                <button class="tab-btn active" data-target="tab-rotas">
+                    <i class="fa-solid fa-route"></i> Inteligência Preditiva
+                </button>
+                <button class="tab-btn" data-target="tab-paradas">
+                    <i class="fa-solid fa-gas-pump"></i> Rede de Paradas Seguras
+                </button>
+                <button class="tab-btn" data-target="tab-alerta">
+                    <i class="fa-solid fa-bell"></i> Protocolo SOS & Resgate
+                </button>
+            </div>
+
+            <div class="tab-panel active" id="tab-rotas">
+                <div class="panel-split">
+                    <div class="panel-content">
+                        <h3><i class="fa-solid fa-shield-virus"></i> Análise de Risco Antes e Durante a Viagem</h3>
+                        <p>Cruzamos dados históricos de boletins de ocorrência, horários de maior incidência e qualidade de sinal 4G/Satélite. Se o motorista se aproximar de uma mancha criminal, o painel sugere desvios ou comboio imediato.</p>
+                        <a href="app.html" class="btn btn-primary" style="margin-top: 1.2rem;">Testar no Mapa Ao Vivo</a>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=700&q=80" alt="Mapa e navegação GPS" class="panel-img">
+                </div>
+            </div>
+
+            <div class="tab-panel" id="tab-paradas">
+                <div class="panel-split">
+                    <div class="panel-content">
+                        <h3><i class="fa-solid fa-square-parking"></i> Pátios Homologados e Perímetro Blindado</h3>
+                        <p>Localize postos credenciados com vigilância armada 24h, controle de acesso por placa e iluminação LED. Ao ativar o Modo Pernoite, os sensores de porta e desengate da carreta entram em estado de alerta máximo.</p>
+                        <a href="app.html" class="btn btn-primary" style="margin-top: 1.2rem;">Ver Pontos de Apoio</a>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1565043666747-69f6646db940?auto=format&fit=crop&w=700&q=80" alt="Frota estacionada em pátio seguro" class="panel-img">
+                </div>
+            </div>
+
+            <div class="tab-panel" id="tab-alerta">
+                <div class="panel-split">
+                    <div class="panel-content">
+                        <h3><i class="fa-solid fa-tower-broadcast"></i> Acionamento Crítico Multi-Agência</h3>
+                        <p>Em emergências médicas, acidentes ou tentativas de assalto, o sistema dispara alerta sonoro configurável, trava o baú eletronicamente e abre canal direto com PRF (191), Polícia Militar (190) e SAMU (192).</p>
+                        <a href="app.html" class="btn btn-primary" style="margin-top: 1.2rem;">Simular Central de Emergência</a>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=700&q=80" alt="Central de monitoramento logístico" class="panel-img">
+                </div>
             </div>
         </div>
     </section>
 
     <footer>
-        <p>&copy; 2026 - Estrada Segura. Desenvolvido para proteção e logística avançada.</p>
+        <div class="footer-content">
+            <div class="logo"><i class="fa-solid fa-shield-halved"></i> ESTRADA SEGURA</div>
+            <p>&copy; 2026 - Estrada Segura. Projeto TCC Técnico em Logística • Escola Miguel Vicente Cury.</p>
+        </div>
     </footer>
+
+    <script src="main.js"></script>
 </body>
 </html>
