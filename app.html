@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Estrada Segura - Painel do Caminhoneiro</title>
+    <link rel="stylesheet" href="style.css"> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="app-body">
+    
+    <div class="app-container">
+        <aside class="app-sidebar">
+            <div class="app-brand"><i class="fa-solid fa-truck-fast"></i> Painel</div>
+            <nav class="app-menu">
+                <button class="menu-btn active"><i class="fa-solid fa-satellite-dish"></i> Monitoramento</button>
+                <button class="menu-btn"><i class="fa-solid fa-route"></i> Histórico</button>
+                <button class="menu-btn"><i class="fa-solid fa-gas-pump"></i> Serviços</button>
+            </nav>
+            <div class="back-home">
+                <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Sair do App</a>
+            </div>
+        </aside>
+
+        <main class="app-main" id="main-area">
+            <header class="app-topbar">
+                <div class="driver-info">
+                    <img src="https://ui-avatars.com/api/?name=Grupo+5&background=2C3E50&color=fff" alt="Avatar">
+                    <div>
+                        <strong>Caminhão: Volvo FH 540 (Placa ABC-1234)</strong>
+                        <span id="status-text" class="status-badge status-ok">Rota Ativa - Seguro</span>
+                    </div>
+                </div>
+                <div class="time-widget" id="clock">00:00:00</div>
+            </header>
+
+            <div class="app-content">
+                
+                <div class="dashboard-left">
+                    <div class="widget map-widget">
+                        <h3><i class="fa-solid fa-map"></i> GPS / Mapeamento Dinâmico</h3>
+                        <div class="map-container" id="map-simulation">
+                            <div class="pulse-marker" id="truck-marker" style="top: 50%; left: 50%;">
+                                <i class="fa-solid fa-truck" style="color: black; font-size: 10px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></i>
+                            </div>
+                            
+                            <div class="safe-point-marker hidden" id="prf-point" style="top: 20%; left: 80%;"><i class="fa-solid fa-building-shield"></i> PRF (12km)</div>
+                            <div class="safe-point-marker hidden" style="top: 70%; left: 15%;"><i class="fa-solid fa-gas-pump"></i> Posto Seguro</div>
+                            
+                            <div class="escape-route hidden" id="escape-route"></div>
+                        </div>
+                    </div>
+
+                    <div class="widget log-widget">
+                        <h3><i class="fa-solid fa-clipboard-list"></i> Registro de Eventos da Viagem</h3>
+                        <ul id="event-logs">
+                            <li><em>08:00</em> - Sistema inicializado com sucesso.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="dashboard-right">
+                    
+                    <div class="widget action-widget">
+                        <h3><i class="fa-solid fa-magnifying-glass-chart"></i> Inteligência de Rota</h3>
+                        <div class="route-selector">
+                            <label>Analisar trecho à frente (IA):</label>
+                            <select id="route-select" onchange="analyzeRoute()">
+                                <option value="">-- Selecione uma Rota --</option>
+                                <option value="safe">BR-050 (Trecho Concedido/Monitorado)</option>
+                                <option value="warning">Rodovia Anhanguera (Obras / Sem Sinal)</option>
+                                <option value="danger">BR-116 (Alto Risco - Mancha Criminal)</option>
+                            </select>
+                        </div>
+                        <div id="route-analysis" class="analysis-box">
+                            Aguardando seleção para consulta no banco de dados policial.
+                        </div>
+                    </div>
+
+                    <div class="widget sos-widget">
+                        <div class="sos-container">
+                            <button class="sos-btn" id="sosButton" onclick="activateSOS()">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                <span>PÂNICO (SOS)</span>
+                            </button>
+                            <p class="sos-hint">Alerta silencioso: trava o baú, corta combustível e aciona a Polícia Rodoviária imediatamente.</p>
+                        </div>
+                    </div>
+
+                    <div class="widget grid-actions">
+                        <button class="action-btn" onclick="findSafeStops()"><i class="fa-solid fa-person-running"></i> Buscar Abrigo</button>
+                        <button class="action-btn" onclick="toggleChat()"><i class="fa-solid fa-headset"></i> Falar Base</button>
+                        <button class="action-btn" onclick="sleepMode()"><i class="fa-solid fa-bed"></i> Modo Pernoite</button>
+                        <button class="action-btn" onclick="manualCheckin()"><i class="fa-solid fa-location-crosshairs"></i> Check-in GPS</button>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+
+        <div id="chat-modal" class="chat-modal hidden">
+            <div class="chat-header">
+                <span><i class="fa-solid fa-walkie-talkie"></i> Central de Logística 24h</span>
+                <button onclick="toggleChat()" style="background:none; border:none; color:white; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <div class="msg base-msg">Base: QAP motorista. Tudo certo na rota?</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" placeholder="Digite sua mensagem...">
+                <button onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+
+        <div id="sos-overlay" class="sos-overlay hidden">
+            <div class="sos-modal">
+                <i class="fa-solid fa-tower-broadcast fa-fade" style="font-size: 3rem; color: #e74c3c;"></i>
+                <h2>ALERTA ENVIADO!</h2>
+                <p>O caminhão está sendo bloqueado de forma progressiva. A polícia está a caminho da sua coordenada.</p>
+                <div class="progress-bar"><div class="progress"></div></div>
+                <button onclick="cancelSOS()" class="cancel-sos">Desativar Alarme (Requer Senha Contra Coação)</button>
+            </div>
+        </div>
+
+    </div>
+    
+    <script src="script.js"></script> </body>
+</html>
