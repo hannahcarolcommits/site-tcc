@@ -1,127 +1,441 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Estrada Segura - Painel do Caminhoneiro</title>
-    <link rel="stylesheet" href="style.css"> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Painel Operacional - Estrada Segura</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS (Mapa Real Interativo) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body class="app-body">
     
     <div class="app-container">
-        <aside class="app-sidebar">
-            <div class="app-brand"><i class="fa-solid fa-truck-fast"></i> Painel</div>
+        <!-- SIDEBAR DESKTOP / DRAWER MOBILE -->
+        <aside class="app-sidebar" id="app-sidebar">
+            <div class="app-brand">
+                <div class="logo-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                <span>ESTRADA <strong>SEGURA</strong></span>
+                <button class="close-sidebar-mobile" onclick="toggleAppSidebar()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
             <nav class="app-menu">
-                <button class="menu-btn active"><i class="fa-solid fa-satellite-dish"></i> Monitoramento</button>
-                <button class="menu-btn"><i class="fa-solid fa-route"></i> Histórico</button>
-                <button class="menu-btn"><i class="fa-solid fa-gas-pump"></i> Serviços</button>
+                <button class="menu-btn active" onclick="switchAppTab(event, 'tab-monitoramento')">
+                    <i class="fa-solid fa-satellite-dish"></i> Monitoramento Ao Vivo
+                </button>
+                <button class="menu-btn" onclick="switchAppTab(event, 'tab-rotas-lista')">
+                    <i class="fa-solid fa-road"></i> Mapa de Ruas & Rodovias
+                </button>
+                <button class="menu-btn" onclick="switchAppTab(event, 'tab-servicos')">
+                    <i class="fa-solid fa-gas-pump"></i> Pontos de Apoio (PRF/Postos)
+                </button>
+                <button class="menu-btn" onclick="switchAppTab(event, 'tab-historico')">
+                    <i class="fa-solid fa-route"></i> Histórico de Viagens
+                </button>
             </nav>
-            <div class="back-home">
-                <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Sair do App</a>
+
+            <div class="sidebar-status">
+                <div class="signal-row">
+                    <span><i class="fa-solid fa-satellite"></i> Satélite GPS</span>
+                    <strong style="color: var(--status-safe);">99%</strong>
+                </div>
+                <div class="signal-row">
+                    <span><i class="fa-solid fa-tower-cell"></i> Rede 4G/5G</span>
+                    <strong id="signal-quality" style="color: var(--accent-orange);">Forte</strong>
+                </div>
+                <div class="signal-row">
+                    <span><i class="fa-solid fa-temperature-half"></i> Baú Refrigerado</span>
+                    <strong>-4.2 °C</strong>
+                </div>
+            </div>
+
+            <div class="sidebar-actions">
+                <button class="theme-toggle-btn full-width" onclick="toggleTheme()">
+                    <i class="fa-solid fa-sun" id="theme-icon"></i>
+                    <span id="theme-text">Modo Claro</span>
+                </button>
+                <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Voltar ao Portal</a>
             </div>
         </aside>
 
+        <!-- ÁREA PRINCIPAL -->
         <main class="app-main" id="main-area">
             <header class="app-topbar">
-                <div class="driver-info">
-                    <img src="https://ui-avatars.com/api/?name=Grupo+5&background=2C3E50&color=fff" alt="Avatar">
-                    <div>
-                        <strong>Caminhão: Volvo FH 540 (Placa ABC-1234)</strong>
-                        <span id="status-text" class="status-badge status-ok">Rota Ativa - Seguro</span>
+                <div class="topbar-left">
+                    <button class="mobile-drawer-btn" onclick="toggleAppSidebar()" aria-label="Menu">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <div class="driver-info">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" alt="Motorista Carlos">
+                        <div>
+                            <strong>Carlos Mendes • Volvo FH 540 (ABC-1234)</strong>
+                            <span id="status-text" class="status-badge status-ok">
+                                <i class="fa-solid fa-shield-check"></i> Rota Ativa - Perímetro Seguro
+                            </span>
+                        </div>
                     </div>
                 </div>
-                <div class="time-widget" id="clock">00:00:00</div>
+
+                <!-- Barra de Telemetria Rápida -->
+                <div class="telemetry-bar">
+                    <div class="telemetry-item" title="Velocidade Atual">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        <span id="live-speed">76 km/h</span>
+                    </div>
+                    <div class="telemetry-item" title="Trava Eletromagnética">
+                        <i class="fa-solid fa-lock"></i>
+                        <span id="cargo-lock-status">Baú Travado</span>
+                    </div>
+                    <button class="telemetry-item btn-gps-real" onclick="useRealLocation()" title="Usar minha localização real do navegador">
+                        <i class="fa-solid fa-location-crosshairs"></i>
+                        <span>Meu GPS</span>
+                    </button>
+                    <div class="time-widget" id="clock">00:00:00</div>
+                </div>
             </header>
 
-            <div class="app-content">
-                
-                <div class="dashboard-left">
-                    <div class="widget map-widget">
-                        <h3><i class="fa-solid fa-map"></i> GPS / Mapeamento Dinâmico</h3>
-                        <div class="map-container" id="map-simulation">
-                            <div class="pulse-marker" id="truck-marker" style="top: 50%; left: 50%;">
-                                <i class="fa-solid fa-truck" style="color: black; font-size: 10px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></i>
+            <!-- ABA 1: MONITORAMENTO PRINCIPAL -->
+            <div id="tab-monitoramento" class="app-tab-content active">
+                <div class="app-content">
+                    <div class="dashboard-left">
+                        <div class="widget map-widget">
+                            <div class="widget-header-flex">
+                                <div>
+                                    <h3><i class="fa-solid fa-map-location-dot"></i> Rastreamento Satelital em Tempo Real</h3>
+                                    <small id="current-road-label" class="road-subtitle">Trecho atual: Rod. Anhanguera (SP-330) - Km 98, Campinas/SP</small>
+                                </div>
+                                <div class="map-controls-top">
+                                    <button class="mini-btn" onclick="toggleTruckSimulation()" id="sim-toggle-btn">
+                                        <i class="fa-solid fa-pause"></i> Pausar Rota
+                                    </button>
+                                    <span class="live-tag"><i class="fa-solid fa-circle"></i> AO VIVO</span>
+                                </div>
                             </div>
                             
-                            <div class="safe-point-marker hidden" id="prf-point" style="top: 20%; left: 80%;"><i class="fa-solid fa-building-shield"></i> PRF (12km)</div>
-                            <div class="safe-point-marker hidden" style="top: 70%; left: 15%;"><i class="fa-solid fa-gas-pump"></i> Posto Seguro</div>
-                            
-                            <div class="escape-route hidden" id="escape-route"></div>
+                            <!-- MAPA INTERATIVO REAL (LEAFLET) -->
+                            <div id="real-map" class="real-map-box"></div>
+                        </div>
+
+                        <div class="widget log-widget">
+                            <div class="widget-header-flex">
+                                <h3><i class="fa-solid fa-clipboard-list"></i> Diário de Bordo & Telemetria</h3>
+                                <button class="mini-btn" onclick="clearLogs()">Limpar</button>
+                            </div>
+                            <ul id="event-logs">
+                                <li><em>08:00</em> - Sistema inicializado. Trava eletromagnética do baú verificada.</li>
+                            </ul>
                         </div>
                     </div>
 
-                    <div class="widget log-widget">
-                        <h3><i class="fa-solid fa-clipboard-list"></i> Registro de Eventos da Viagem</h3>
-                        <ul id="event-logs">
-                            <li><em>08:00</em> - Sistema inicializado com sucesso.</li>
-                        </ul>
+                    <div class="dashboard-right">
+                        <!-- INTELIGÊNCIA DE ROTA EXPANDIDA -->
+                        <div class="widget action-widget">
+                            <h3><i class="fa-solid fa-magnifying-glass-chart"></i> Análise Preditiva de Rodovias</h3>
+                            <p class="widget-desc">Selecione uma rodovia ou rua crítica para simular o trajeto no mapa e avaliar o risco:</p>
+                            <div class="route-selector">
+                                <select id="route-select" onchange="analyzeRoute()">
+                                    <option value="sp330">SP-330 • Rod. Anhanguera (Campinas → Jundiaí)</option>
+                                    <option value="br050">BR-050 • Trecho Concedido (Uberaba → Uberlândia)</option>
+                                    <option value="sp348">SP-348 • Rod. dos Bandeirantes (Km 35 ao 72)</option>
+                                    <option value="br381">BR-381 • Fernão Dias (Trecho Serra / Obras)</option>
+                                    <option value="sp021">SP-021 • Rodoanel Mário Covas (Trecho Oeste)</option>
+                                    <option value="br116">BR-116 • Régis Bittencourt (Serra do Cafezal - Alerta)</option>
+                                </select>
+                            </div>
+                            <div id="route-analysis" class="analysis-box">
+                                <strong style="color: #10b981"><i class="fa-solid fa-check-circle"></i> Risco Baixo (Score 92/100)</strong><br>
+                                Trecho monitorado por câmeras OCR e viaturas da Polícia Militar Rodoviária.
+                            </div>
+                        </div>
+
+                        <!-- BOTÃO DE PÂNICO SOS -->
+                        <div class="widget sos-widget">
+                            <div class="sos-container">
+                                <button class="sos-btn" id="sosButton" onclick="activateSOS()">
+                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                    <span>ACIONAR SOS</span>
+                                </button>
+                                <p class="sos-hint">
+                                    <strong>Sirene + Bloqueio:</strong> Dispara alarme sonoro, trava o baú, corta combustível e aciona PRF/Ambulância.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- AÇÕES RÁPIDAS -->
+                        <div class="widget grid-actions">
+                            <button class="action-btn" onclick="findSafeStops()">
+                                <i class="fa-solid fa-shield-heart"></i> Rota de Abrigo
+                            </button>
+                            <button class="action-btn" onclick="toggleChat()">
+                                <i class="fa-solid fa-headset"></i> Rádio / Base
+                            </button>
+                            <button class="action-btn" onclick="sleepMode()">
+                                <i class="fa-solid fa-bed"></i> Modo Pernoite
+                            </button>
+                            <button class="action-btn" onclick="openEmergencyDispatchModal()">
+                                <i class="fa-solid fa-truck-medical"></i> Chamar Resgate
+                            </button>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="dashboard-right">
-                    
-                    <div class="widget action-widget">
-                        <h3><i class="fa-solid fa-magnifying-glass-chart"></i> Inteligência de Rota</h3>
-                        <div class="route-selector">
-                            <label>Analisar trecho à frente (IA):</label>
-                            <select id="route-select" onchange="analyzeRoute()">
-                                <option value="">-- Selecione uma Rota --</option>
-                                <option value="safe">BR-050 (Trecho Concedido/Monitorado)</option>
-                                <option value="warning">Rodovia Anhanguera (Obras / Sem Sinal)</option>
-                                <option value="danger">BR-116 (Alto Risco - Mancha Criminal)</option>
-                            </select>
+            <!-- ABA 2: LISTA ELABORADA DE RUAS E RODOVIAS -->
+            <div id="tab-rotas-lista" class="app-tab-content">
+                <div class="widget">
+                    <div class="widget-header-flex">
+                        <div>
+                            <h3><i class="fa-solid fa-road"></i> Base de Dados de Ruas, Avenidas e Rodovias Monitoradas</h3>
+                            <p class="widget-desc">Consulte índices de sinistralidade, cobertura de sinal e clique para carregar a rota no GPS.</p>
                         </div>
-                        <div id="route-analysis" class="analysis-box">
-                            Aguardando seleção para consulta no banco de dados policial.
-                        </div>
+                        <input type="text" id="road-search" class="search-input" placeholder="Buscar rodovia, rua ou cidade..." onkeyup="filterRoads()">
                     </div>
 
-                    <div class="widget sos-widget">
-                        <div class="sos-container">
-                            <button class="sos-btn" id="sosButton" onclick="activateSOS()">
-                                <i class="fa-solid fa-triangle-exclamation"></i>
-                                <span>PÂNICO (SOS)</span>
-                            </button>
-                            <p class="sos-hint">Alerta silencioso: trava o baú, corta combustível e aciona a Polícia Rodoviária imediatamente.</p>
+                    <div class="roads-grid" id="roads-catalog">
+                        <!-- Preenchido via JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA 3: PONTOS DE APOIO -->
+            <div id="tab-servicos" class="app-tab-content">
+                <div class="widget">
+                    <h3><i class="fa-solid fa-square-parking"></i> Rede de Paradas Seguras & Bases PRF</h3>
+                    <p class="widget-desc">Locais verificados com vigilância armada, pátio fechado e suporte ao motorista.</p>
+                    <div class="cards-grid" style="margin-top: 1.5rem;">
+                        <div class="info-card">
+                            <div class="card-img-wrap">
+                                <img src="https://images.unsplash.com/photo-1545173168-9f1947eebb7f?auto=format&fit=crop&w=600&q=80" alt="Posto rodoviário iluminado">
+                            </div>
+                            <div class="card-body">
+                                <h3>Posto Graal Rodoanel (Km 24)</h3>
+                                <p>Vigilância 24h, estacionamento monitorado por CFTV e área de descanso climatizada.</p>
+                                <button class="btn btn-primary" style="margin-top: 1rem; width: 100%; justify-content: center;" onclick="routeToPoint(-23.489, -46.845, 'Posto Graal Rodoanel')">
+                                    <i class="fa-solid fa-diamond-turn-right"></i> Traçar Rota no GPS
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="info-card">
+                            <div class="card-img-wrap">
+                                <img src="https://images.unsplash.com/photo-1590674899484-d5640e854abe?auto=format&fit=crop&w=600&q=80" alt="Base Polícia Rodoviária">
+                            </div>
+                            <div class="card-body">
+                                <h3>Base Operacional PRF - Campinas</h3>
+                                <p>Ponto de apoio policial 24h na Rod. Anhanguera (Km 104). Área segura para pernoite de emergência.</p>
+                                <button class="btn btn-primary" style="margin-top: 1rem; width: 100%; justify-content: center;" onclick="routeToPoint(-22.885, -47.092, 'Base PRF Campinas')">
+                                    <i class="fa-solid fa-diamond-turn-right"></i> Traçar Rota no GPS
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="info-card">
+                            <div class="card-img-wrap">
+                                <img src="https://images.unsplash.com/photo-1513828583688-c52646db42da?auto=format&fit=crop&w=600&q=80" alt="Terminal logístico seguro">
+                            </div>
+                            <div class="card-body">
+                                <h3>Parada Segura Bandeirantes (Km 56)</h3>
+                                <p>Controle biométrico de entrada, iluminação LED total e oficina mecânica de plantão.</p>
+                                <button class="btn btn-primary" style="margin-top: 1rem; width: 100%; justify-content: center;" onclick="routeToPoint(-23.189, -46.965, 'Parada Segura Bandeirantes')">
+                                    <i class="fa-solid fa-diamond-turn-right"></i> Traçar Rota no GPS
+                                </button>
+                            </div>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <div class="widget grid-actions">
-                        <button class="action-btn" onclick="findSafeStops()"><i class="fa-solid fa-person-running"></i> Buscar Abrigo</button>
-                        <button class="action-btn" onclick="toggleChat()"><i class="fa-solid fa-headset"></i> Falar Base</button>
-                        <button class="action-btn" onclick="sleepMode()"><i class="fa-solid fa-bed"></i> Modo Pernoite</button>
-                        <button class="action-btn" onclick="manualCheckin()"><i class="fa-solid fa-location-crosshairs"></i> Check-in GPS</button>
+            <!-- ABA 4: HISTÓRICO DE VIAGENS -->
+            <div id="tab-historico" class="app-tab-content">
+                <div class="widget">
+                    <h3><i class="fa-solid fa-clock-rotate-left"></i> Histórico Auditado de Viagens</h3>
+                    <p class="widget-desc">Relatórios de telemetria e segurança do veículo Volvo FH 540 (ABC-1234).</p>
+                    <div class="history-list">
+                        <div class="history-item">
+                            <div>
+                                <strong>Campinas (SP) → Uberlândia (MG)</strong>
+                                <p>Via SP-330 / BR-050 • 562 km • Carga: Eletrônicos (R$ 480.000,00)</p>
+                            </div>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <span class="status-badge status-ok">Concluída sem Ocorrências</span>
+                                <button class="mini-btn" onclick="openReportPopup('Campinas → Uberlândia', '562 km', '0 alertas', '99.4%')">Ver Laudo</button>
+                            </div>
+                        </div>
+                        <div class="history-item">
+                            <div>
+                                <strong>Porto de Santos (SP) → Guarulhos (SP)</strong>
+                                <p>Via Rod. Anchieta / Rodoanel • 118 km • Carga: Insumos Farmacêuticos</p>
+                            </div>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <span class="status-badge status-warn">Desvio Preventivo Aplicado</span>
+                                <button class="mini-btn" onclick="openReportPopup('Santos → Guarulhos', '118 km', '1 desvio de mancha criminal', '97.8%')">Ver Laudo</button>
+                            </div>
+                        </div>
+                        <div class="history-item">
+                            <div>
+                                <strong>Jundiaí (SP) → Curitiba (PR)</strong>
+                                <p>Via BR-116 Régis Bittencourt • 455 km • Escolta Virtual Ativa</p>
+                            </div>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <span class="status-badge status-ok">Concluída sem Ocorrências</span>
+                                <button class="mini-btn" onclick="openReportPopup('Jundiaí → Curitiba', '455 km', '0 alertas', '98.9%')">Ver Laudo</button>
+                            </div>
+                        </div>
                     </div>
-
                 </div>
             </div>
         </main>
-
-        <div id="chat-modal" class="chat-modal hidden">
-            <div class="chat-header">
-                <span><i class="fa-solid fa-walkie-talkie"></i> Central de Logística 24h</span>
-                <button onclick="toggleChat()" style="background:none; border:none; color:white; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="chat-messages" id="chat-messages">
-                <div class="msg base-msg">Base: QAP motorista. Tudo certo na rota?</div>
-            </div>
-            <div class="chat-input-area">
-                <input type="text" id="chat-input" placeholder="Digite sua mensagem...">
-                <button onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
-            </div>
-        </div>
-
-        <div id="sos-overlay" class="sos-overlay hidden">
-            <div class="sos-modal">
-                <i class="fa-solid fa-tower-broadcast fa-fade" style="font-size: 3rem; color: #e74c3c;"></i>
-                <h2>ALERTA ENVIADO!</h2>
-                <p>O caminhão está sendo bloqueado de forma progressiva. A polícia está a caminho da sua coordenada.</p>
-                <div class="progress-bar"><div class="progress"></div></div>
-                <button onclick="cancelSOS()" class="cancel-sos">Desativar Alarme (Requer Senha Contra Coação)</button>
-            </div>
-        </div>
-
     </div>
-    
-    <script src="script.js"></script> </body>
+
+    <!-- BARRA DE NAVEGAÇÃO INFERIOR PARA CELULAR -->
+    <nav class="mobile-bottom-nav">
+        <button class="mob-nav-btn active" onclick="switchAppTab(event, 'tab-monitoramento')">
+            <i class="fa-solid fa-satellite-dish"></i>
+            <span>Radar</span>
+        </button>
+        <button class="mob-nav-btn" onclick="switchAppTab(event, 'tab-rotas-lista')">
+            <i class="fa-solid fa-road"></i>
+            <span>Ruas</span>
+        </button>
+        <button class="mob-nav-btn sos-mob-trigger" onclick="activateSOS()">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>SOS</span>
+        </button>
+        <button class="mob-nav-btn" onclick="switchAppTab(event, 'tab-servicos')">
+            <i class="fa-solid fa-gas-pump"></i>
+            <span>Apoio</span>
+        </button>
+        <button class="mob-nav-btn" onclick="openEmergencyDispatchModal()">
+            <i class="fa-solid fa-truck-medical"></i>
+            <span>Resgate</span>
+        </button>
+    </nav>
+
+    <!-- CHAT FLUTUANTE COM A BASE -->
+    <div id="chat-modal" class="chat-modal hidden">
+        <div class="chat-header">
+            <span><i class="fa-solid fa-headset"></i> Central Operacional 24h</span>
+            <button class="close-chat-btn" onclick="toggleChat()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="msg base-msg"><strong>Base:</strong> QAP motorista Carlos! Telemetria recebida. Alguma alteração na via?</div>
+        </div>
+        <div class="chat-quick-replies">
+            <button onclick="quickChat('Veículo suspeito me seguindo')">Veículo suspeito</button>
+            <button onclick="quickChat('Solicito autorização de parada')">Pedir parada</button>
+            <button onclick="quickChat('Trânsito parado na pista')">Pista parada</button>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Digite sua mensagem..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- POPUP 1: CENTRAL DE EMERGÊNCIA / RESGATE / AMBULÂNCIA -->
+    <div id="dispatch-modal" class="modal-backdrop hidden">
+        <div class="custom-popup">
+            <div class="popup-header">
+                <h3><i class="fa-solid fa-tower-broadcast" style="color: var(--accent-orange);"></i> Central de Despacho de Emergência</h3>
+                <button class="close-popup-btn" onclick="closeModal('dispatch-modal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="popup-desc">Selecione a unidade de apoio para envio imediato das suas coordenadas GPS e telemetria:</p>
+            
+            <div class="dispatch-options">
+                <button class="dispatch-card" onclick="simulateEmergencyCall('SAMU 192 - Ambulância UTI Móvel', 'fa-truck-medical', '#ef4444')">
+                    <i class="fa-solid fa-truck-medical" style="color: #ef4444;"></i>
+                    <div>
+                        <strong>SAMU 192 / Resgate Médico</strong>
+                        <span>Acidente, mal súbito ou feridos na rodovia</span>
+                    </div>
+                </button>
+
+                <button class="dispatch-card" onclick="simulateEmergencyCall('PRF 191 - Polícia Rodoviária Federal', 'fa-shield-halved', '#38bdf8')">
+                    <i class="fa-solid fa-shield-halved" style="color: #38bdf8;"></i>
+                    <div>
+                        <strong>PRF 191 / Escolta Policial</strong>
+                        <span>Suspeita de assalto, bloqueio ou tentativa de abordagem</span>
+                    </div>
+                </button>
+
+                <button class="dispatch-card" onclick="simulateEmergencyCall('Concessionária / Guincho Pesado', 'fa-truck-pickup', '#f97316')">
+                    <i class="fa-solid fa-truck-pickup" style="color: #f97316;"></i>
+                    <div>
+                        <strong>Guincho & Apoio Mecânico</strong>
+                        <span>Pane seca, falha mecânica ou pneu estourado</span>
+                    </div>
+                </button>
+            </div>
+
+            <!-- SIMULADOR DE CHAMADA ATIVA -->
+            <div id="active-call-box" class="active-call-box hidden">
+                <div class="call-pulse-ring"><i id="call-icon" class="fa-solid fa-phone-volume"></i></div>
+                <h4 id="call-target-name">Conectando...</h4>
+                <p id="call-status-detail">Transmitindo latitude/longitude e placa ABC-1234...</p>
+                <div class="call-timer" id="call-timer">00:00</div>
+                <button class="btn btn-danger-solid" onclick="endSimulatedCall()">
+                    <i class="fa-solid fa-phone-slash"></i> Encerrar Simulação de Chamada
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP 2: LAUDO / NOTIFICAÇÃO GERAL -->
+    <div id="info-modal" class="modal-backdrop hidden">
+        <div class="custom-popup">
+            <div class="popup-header">
+                <h3 id="info-modal-title"><i class="fa-solid fa-file-shield"></i> Detalhes</h3>
+                <button class="close-popup-btn" onclick="closeModal('info-modal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="info-modal-body" class="popup-body-content"></div>
+            <div style="margin-top: 1.5rem; text-align: right;">
+                <button class="btn btn-primary" onclick="closeModal('info-modal')">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- OVERLAY DE PÂNICO SOS COM SIRENE E CONTAGEM REGRESSIVA -->
+    <div id="sos-overlay" class="sos-overlay hidden">
+        <div class="sos-modal">
+            <div class="siren-beacon">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h2>ALERTA DE PÂNICO ATIVADO!</h2>
+            <p>Sirene embarcada disparada! Coordenadas enviadas em tempo real para a <strong>PRF (191)</strong> e <strong>Central de Monitoramento</strong>.</p>
+            
+            <div class="sos-telemetry-box">
+                <div><span>Corte de Combustível:</span> <strong id="fuel-countdown">02:59</strong></div>
+                <div><span>Trava do Baú:</span> <strong style="color: #10b981;">BLINDADA</strong></div>
+                <div><span>Áudio da Cabine:</span> <strong style="color: #f97316;">GRAVANDO</strong></div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+
+            <div class="sos-modal-actions">
+                <button class="btn-mute-siren" id="mute-siren-btn" onclick="toggleSirenMute()">
+                    <i class="fa-solid fa-volume-high"></i> Silenciar Sirene
+                </button>
+                <button class="cancel-sos" onclick="openCancelSOSModal()">
+                    <i class="fa-solid fa-key"></i> Desarmar com Senha
+                </button>
+            </div>
+
+            <!-- CAIXA DE SENHA INTEGRADA (SEM PROMPT FEIO DO NAVEGADOR) -->
+            <div id="sos-pin-box" class="sos-pin-box hidden">
+                <label>Digite a senha de contra-coação (padrão: <strong>1234</strong>):</label>
+                <div class="pin-row">
+                    <input type="password" id="sos-pin-input" maxlength="6" placeholder="****" onkeypress="if(event.key==='Enter') verifySOSPin()">
+                    <button class="btn btn-primary" onclick="verifySOSPin()">Confirmar</button>
+                </div>
+                <small id="sos-pin-error" style="color: #ef4444; display: none; margin-top: 6px;">Senha incorreta! O bloqueio continua ativo.</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="main.js"></script>
+</body>
 </html>
