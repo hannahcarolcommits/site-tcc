@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,46 +9,142 @@
 </head>
 <body>
     <nav class="navbar">
-        <div class="logo"><i class="fa-solid fa-shield-halved"></i> ESTRADA SEGURA</div>
-        <ul class="nav-links">
-            <li><a href="index.html">Início</a></li>
-            <li><a href="app.html">Simulador do App</a></li>
-            <li><a href="sobre.html" class="active">Sobre o Projeto</a></li>
-        </ul>
+        <a href="index.html" class="logo">
+            <div class="logo-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <span>ESTRADA <strong>SEGURA</strong></span>
+        </a>
+
+        <button class="mobile-menu-btn" onclick="toggleMobileNav()" aria-label="Abrir menu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <div class="nav-right" id="nav-menu">
+            <ul class="nav-links">
+                <li><a href="index.html">Início</a></li>
+                <li><a href="app.html">Painel & Simulador</a></li>
+                <li><a href="sobre.html" class="active">Sobre o Projeto</a></li>
+            </ul>
+            <button class="theme-toggle-btn" onclick="toggleTheme()" title="Alternar Modo Claro/Escuro">
+                <i class="fa-solid fa-sun" id="theme-icon"></i>
+                <span class="theme-label">Tema</span>
+            </button>
+        </div>
     </nav>
 
     <div class="container page-content">
         <div class="about-card">
-            <h2><i class="fa-solid fa-graduation-cap"></i> Escopo Acadêmico</h2>
-            <p>Este portal é resultado do escopo referente ao Projeto apresentado aos Professores da <strong>Escola Miguel Vicente Cury</strong>, como parte dos requisitos à obtenção do 3º ano de Técnico em Logística.</p>
-            
-            <hr class="divider">
-
-            <h3>Objetivos do Projeto (SMART)</h3>
-            <ul class="smart-list">
-                <li><strong>Específico:</strong> Identificar as principais causas do roubo de cargas no Brasil.</li>
-                <li><strong>Mensurável:</strong> Analisar os prejuízos financeiros e operacionais com dados estatísticos.</li>
-                <li><strong>Atingível:</strong> Avaliar impactos nos motoristas com base em relatórios do setor.</li>
-                <li><strong>Relevante:</strong> Investigar tecnologias de segurança (rastreamento, sensores).</li>
-                <li><strong>Temporal:</strong> Propor soluções práticas até a conclusão, prevista para 2026.</li>
-            </ul>
-
-            <hr class="divider">
-
-            <h3>Desenvolvedores - Grupo 5</h3>
-            <div class="team-grid">
-                <div class="team-member"><i class="fa-regular fa-user"></i> Alicia Dias Martins</div>
-                <div class="team-member"><i class="fa-regular fa-user"></i> Anna Lanis Amélia Santos da Silva</div>
-                <div class="team-member"><i class="fa-regular fa-user"></i> Caio Barcelos do Prado</div>
-                <div class="team-member"><i class="fa-regular fa-user"></i> Hannah Carolina Dantas Ferreira</div>
-                <div class="team-member"><i class="fa-regular fa-user"></i> Isabela Dias da Rosa Silva</div>
-                <div class="team-member"><i class="fa-regular fa-user"></i> Ryan Luciano Prates</div>
+            <div class="academic-header">
+                <span class="badge-hero"><i class="fa-solid fa-school"></i> TCC • Técnico em Logística</span>
+                <h2><i class="fa-solid fa-graduation-cap"></i> Escopo Acadêmico</h2>
+                <p>Este portal e simulador operacional integram o Trabalho de Conclusão de Curso apresentado aos Professores da <strong>Escola Miguel Vicente Cury</strong>, como requisito para obtenção do diploma do 3º ano de <strong>Técnico em Logística</strong>.</p>
             </div>
             
-            <p style="margin-top: 2rem; text-align: center; color: var(--primary-light);">
-                <strong>Orientadora:</strong> Manuela De Oliveira Silva | <strong>Campinas - 2026</strong>
-            </p>
+            <hr class="divider">
+
+            <div class="section-subtitle">
+                <h3><i class="fa-solid fa-bullseye"></i> Objetivos Estratégicos (Metodologia SMART)</h3>
+                <p>Clique em cada critério para visualizar o foco da pesquisa:</p>
+            </div>
+
+            <div class="smart-grid">
+                <div class="smart-card active" onclick="destacarSmart(this)">
+                    <div class="smart-letter">S</div>
+                    <div class="smart-info">
+                        <strong>Específico (Specific)</strong>
+                        <p>Identificar as principais causas, horários críticos e padrões geográficos do roubo de cargas nas rodovias brasileiras.</p>
+                    </div>
+                </div>
+
+                <div class="smart-card" onclick="destacarSmart(this)">
+                    <div class="smart-letter">M</div>
+                    <div class="smart-info">
+                        <strong>Mensurável (Measurable)</strong>
+                        <p>Quantificar os prejuízos financeiros e operacionais com base em relatórios estatísticos da NTC&Logística e PRF.</p>
+                    </div>
+                </div>
+
+                <div class="smart-card" onclick="destacarSmart(this)">
+                    <div class="smart-letter">A</div>
+                    <div class="smart-info">
+                        <strong>Atingível (Achievable)</strong>
+                        <p>Mitigar os impactos físicos e psicológicos nos motoristas através de alertas preventivos e paradas homologadas.</p>
+                    </div>
+                </div>
+
+                <div class="smart-card" onclick="destacarSmart(this)">
+                    <div class="smart-letter">R</div>
+                    <div class="smart-info">
+                        <strong>Relevante (Relevant)</strong>
+                        <p>Aplicar tecnologias de telemetria preditiva, geofencing e bloqueio remoto contra jammers e abordagens.</p>
+                    </div>
+                </div>
+
+                <div class="smart-card" onclick="destacarSmart(this)">
+                    <div class="smart-letter">T</div>
+                    <div class="smart-info">
+                        <strong>Temporal (Time-bound)</strong>
+                        <p>Desenvolver, testar e validar o protótipo funcional até a banca final do curso técnico em 2026.</p>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <div class="section-subtitle">
+                <h3><i class="fa-solid fa-users-gear"></i> Equipe Desenvolvedora — Grupo 5</h3>
+                <p>Pesquisa logística, análise de risco e prototipagem digital:</p>
+            </div>
+
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="member-avatar">AD</div>
+                    <span>Alicia Dias Martins</span>
+                </div>
+                <div class="team-member">
+                    <div class="member-avatar">AL</div>
+                    <span>Anna Lanis Amélia Santos da Silva</span>
+                </div>
+                <div class="team-member">
+                    <div class="member-avatar">CB</div>
+                    <span>Caio Barcelos do Prado</span>
+                </div>
+                <div class="team-member">
+                    <div class="member-avatar">HC</div>
+                    <span>Hannah Carolina Dantas Ferreira</span>
+                </div>
+                <div class="team-member">
+                    <div class="member-avatar">ID</div>
+                    <span>Isabela Dias da Rosa Silva</span>
+                </div>
+                <div class="team-member">
+                    <div class="member-avatar">RL</div>
+                    <span>Ryan Luciano Prates</span>
+                </div>
+            </div>
+            
+            <div class="advisor-box">
+                <i class="fa-solid fa-chalkboard-user"></i>
+                <div>
+                    <strong>Professora Orientadora:</strong> Manuela De Oliveira Silva
+                    <span>Campinas - SP • 2026</span>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 2.2rem;">
+                <a href="app.html" class="btn btn-primary">
+                    <i class="fa-solid fa-mobile-screen-button"></i> Testar o Simulador Completo
+                </a>
+            </div>
         </div>
     </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="logo"><i class="fa-solid fa-shield-halved"></i> ESTRADA SEGURA</div>
+            <p>&copy; 2026 - Estrada Segura. Projeto TCC - Escola Miguel Vicente Cury.</p>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
 </body>
 </html>
